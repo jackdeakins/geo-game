@@ -1,4 +1,5 @@
 import Map from "./components/Map";
+import Menu from "./components/Menu";
 
 function App() {
   return( 
@@ -12,6 +13,7 @@ function App() {
     justifyContent: "center",
     gap: "16px",
   }}>
+    <Menu />
     <h1 style={{color: "white", fontSize: "24px"}}> Geo Game</h1>
     <div style = {{
       width: "80%",
@@ -20,7 +22,7 @@ function App() {
       overflow: "hidden",
       boxShadow: "0 8px 32px rgba(0,0,0,0.5)"
     }}>
-      <Map />;
+      <Map />
     </div>
   </div>
   );

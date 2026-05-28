@@ -4,8 +4,7 @@ import GameOverlay from './components/GameOverlay';
 import Menu from './components/Menu';
 
 const TOTAL_ROUNDS = 10;
-const GEOJSON_URL =
-    'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson';
+const GEOJSON_URL = '/countries.geojson';
 
 function centroid(feature) {
     const geom = feature.geometry;

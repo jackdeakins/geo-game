@@ -7,6 +7,13 @@ export default function AnimatedPolyline({ positions, pathOptions, distKm, liveS
   const layerRef = useRef(null);
   const rafRef = useRef(null);
 
+  const [start, end] = positions;
+  let endLng = end[1];
+  const lngDiff = endLng - start[1];
+  if (lngDiff > 180) endLng -= 360;
+  if (lngDiff < -180) endLng += 360;
+  const fixedPositions = [start, [end[0], endLng]];
+
   useEffect(() => {
     const layer = layerRef.current;
     if (!layer) return;
@@ -45,5 +52,5 @@ export default function AnimatedPolyline({ positions, pathOptions, distKm, liveS
     };
   }, []);
 
-  return <Polyline ref={layerRef} positions={positions} pathOptions={pathOptions} />;
+  return <Polyline ref={layerRef} positions={fixedPositions} pathOptions={pathOptions} />;
 }

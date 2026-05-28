@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Africa from '../assets/af.png';
 import NA from '../assets/na.png';
 import Europe from '../assets/eu.png';
@@ -34,12 +34,22 @@ const items = [
 export default function Menu() {
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState(null);
+  const timeoutRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    clearTimeout(timeoutRef.current);
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => setOpen(false), 450);
+  };
 
   return (
     <div
       style={{ position: 'fixed', top: 16, left: 16, zIndex: 10000, width: 'fit-content' }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <button
         style={{
@@ -58,6 +68,9 @@ export default function Menu() {
 
       <div
         style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
           marginTop: 4,
           background: 'rgba(20,20,40,0.95)',
           backdropFilter: 'blur(12px)',

@@ -1,56 +1,80 @@
-import { useEffect, useRef } from 'react';
-import { Polyline } from 'react-leaflet';
+import { useEffect, useRef, useState } from 'react';
+import { Source, Layer } from 'react-map-gl/maplibre';
 
 export const ANIM_DURATION = 1400;
 
+function interpolate(start, end, t) {
+  return [
+    start[0] + (end[0] - start[0]) * t,
+    start[1] + (end[1] - start[1]) * t,
+  ];
+}
+
+function buildLineGeoJSON(start, end, t) {
+  const points = [];
+  const steps = Math.max(2, Math.round(t * 50));
+  for (let i = 0; i <= steps; i++) {
+    points.push(interpolate(start, end, (i / steps) * t));
+  }
+  return {
+    type: 'FeatureCollection',
+    features: [{
+      type: 'Feature',
+      geometry: { type: 'LineString', coordinates: points },
+    }],
+  };
+}
+
 export default function AnimatedPolyline({ positions, pathOptions, distKm, liveScoreRef }) {
-  const layerRef = useRef(null);
+  const [lineData, setLineData] = useState(null);
   const rafRef = useRef(null);
 
   const [start, end] = positions;
+  // antimeridian fix
   let endLng = end[1];
   const lngDiff = endLng - start[1];
   if (lngDiff > 180) endLng -= 360;
   if (lngDiff < -180) endLng += 360;
-  const fixedPositions = [start, [end[0], endLng]];
+
+  const startCoord = [start[1], start[0]]; // MapLibre uses [lng, lat]
+  const endCoord = [endLng, end[0]];
 
   useEffect(() => {
-    const layer = layerRef.current;
-    if (!layer) return;
+    const startTime = performance.now();
 
-    // Wait one frame so Leaflet has rendered the SVG path
-    rafRef.current = requestAnimationFrame(() => {
-      const el = layer.getElement();
-      if (!el) return;
+    function tick(now) {
+      const t = Math.min((now - startTime) / ANIM_DURATION, 1);
+      setLineData(buildLineGeoJSON(startCoord, endCoord, t));
 
-      const totalLength = el.getTotalLength();
-      el.style.strokeDasharray = totalLength;
-      el.style.strokeDashoffset = totalLength;
-
-      const start = performance.now();
-
-      function tick(now) {
-        const t = Math.min((now - start) / ANIM_DURATION, 1);
-        el.style.strokeDashoffset = totalLength * (1 - t);
-
-        // Live score: 2500 → actual distScore as line extends toward country
-        if (liveScoreRef?.current) {
-          const live = Math.round(2500 * Math.exp(-(distKm * t) / 1500));
-          liveScoreRef.current.textContent = live;
-        }
-
-        if (t < 1) {
-          rafRef.current = requestAnimationFrame(tick);
-        }
+      if (liveScoreRef?.current) {
+        const live = Math.round(2500 * Math.exp(-(distKm * t) / 1500));
+        liveScoreRef.current.textContent = live;
       }
 
-      rafRef.current = requestAnimationFrame(tick);
-    });
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(tick);
+      }
+    }
+
+    rafRef.current = requestAnimationFrame(tick);
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
-  return <Polyline ref={layerRef} positions={fixedPositions} pathOptions={pathOptions} />;
+  if (!lineData) return null;
+
+  return (
+    <Source id="animated-line" type="geojson" data={lineData}>
+      <Layer
+        id="animated-line-layer"
+        type="line"
+        paint={{
+          'line-color': pathOptions?.color || '#ff9800',
+          'line-width': pathOptions?.weight || 2.5,
+        }}
+      />
+    </Source>
+  );
 }

@@ -127,11 +127,21 @@ export default function GameMap({ geoData, target, result, showHighlight, showRe
           <Source id="countries" type="geojson" data={geoData}>
             <Layer {...landLayer(satellite)} />
             <Layer {...borderLayer(!hardMode)} />
-            {showHighlight && target && (
-              <Layer {...highlightLayer(target.name)} />
-            )}
+            <Layer {...highlightLayer(showHighlight && target ? target.name : '')} />
           </Source>
         )}
+
+        <Source id="lakes" type="geojson" data="/lakes.geojson">
+          <Layer
+            id="lakes-fill"
+            type="fill"
+            paint={{
+              'fill-color': '#7ab8d9',
+              'fill-opacity': satellite ? 0 : 1,
+              'fill-opacity-transition': { duration: 400, delay: 0 },
+            }}
+          />
+        </Source>
 
         {result && !result.correct && target && (
           <AnimatedPolyline

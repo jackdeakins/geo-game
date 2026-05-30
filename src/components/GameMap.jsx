@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 //import { MapContainer, TileLayer, CircleMarker, useMapEvents, Pane } from 'react-leaflet';
 import Map, { Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -13,17 +13,8 @@ import AnimatedPolyline from './AnimatedPolyline';
 //}
 const MAP_STYLE = {
   version: 8,
-  sources: {
-    'esri-topo': {
-      type: 'raster',
-      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}'],
-      tileSize: 256,
-      maxzoom: 8, // stop requesting tiles past zoom 8
-    },
-  },
-  layers: [
-    { id: 'esri-topo', type: 'raster', source: 'esri-topo' },
-  ],
+  sources: {},
+  layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#7ab8d9' } }],
 };
 
 const guessMarkerLayer = (correct) => ({
@@ -50,13 +41,14 @@ const targetMarkerLayer = () => ({
   },
 });
 
-const landLayer = (hardMode) => ({
+const landLayer = (satellite) => ({
   id: 'countries-fill',
   type: 'fill',
   source: 'countries',
   paint: {
     'fill-color': '#e8d5b0',
-    'fill-opacity': hardMode ? 1 : 0,
+    'fill-opacity': satellite ? 0 : 1,
+    'fill-opacity-transition': { duration: 400, delay: 0 },
   },
 });
 
@@ -81,7 +73,7 @@ const highlightLayer = (targetName) => ({
   },
 });
 
-export default function GameMap({ geoData, target, result, showHighlight, showResult, onMapClick, hardMode }) {
+export default function GameMap({ geoData, target, result, showHighlight, showResult, onMapClick, hardMode, satellite }) {
   const mapRef = useRef(null);
   //const handlerRef = useRef(onMapClick);
   //const vectorGridRef = useRef(null);
@@ -127,9 +119,26 @@ export default function GameMap({ geoData, target, result, showHighlight, showRe
         onClick={handleClick}
         mapStyle={MAP_STYLE}
       >
+        <Source
+          id="esri-topo"
+          type="raster"
+          tiles={['https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}']}
+          tileSize={256}
+          maxzoom={8}
+        >
+          <Layer
+            id="esri-topo-layer"
+            type="raster"
+            paint={{
+              'raster-opacity': satellite ? 1 : 0,
+              'raster-opacity-transition': { duration: 400, delay: 0 },
+            }}
+          />
+        </Source>
+
         {geoData && (
           <Source id="countries" type="geojson" data={geoData}> 
-            <Layer {...landLayer(hardMode)} /> 
+            <Layer {...landLayer(satellite)} /> 
             <Layer {...borderLayer(!hardMode)} /> 
             {showHighlight && target && (
               <Layer {...highlightLayer(target.name)} /> 

@@ -50,6 +50,7 @@ export default function App() {
     const [result, setResult] = useState(null);
     const [showHighlight, setShowHighlight] = useState(false);
     const [hardMode, setHardMode] = useState(false);
+    const [satellite, setSatellite] = useState(true);
     const [showResult, setShowResult] = useState(false);
     const pendingRef = useRef(false);
     const countriesRef = useRef([]);
@@ -153,49 +154,63 @@ export default function App() {
                 showResult={showResult}
                 onMapClick={handleClick}
                 hardMode={hardMode}
+                satellite={satellite}
             />
-            <button
-                onClick={() => setHardMode(h => !h)}
-                style={{
-                    position: 'fixed',
-                    top: 16,
-                    right: 16,
-                    zIndex: 10000,
-                    background: 'rgba(20,20,40,0.88)',
-                    backdropFilter: 'blur(8px)',
-                    color: 'white',
-                    border: '1px solid #444',
-                    borderRadius: 8,
-                    padding: '8px 16px',
-                    fontSize: 13,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                }}
-            >
-                <span style={{ fontWeight: 'bold', letterSpacing: '0.04em' }}>Hard Mode</span>
-                <span style={{
-                    width: 36,
-                    height: 20,
-                    borderRadius: 10,
-                    background: hardMode ? '#c0392b' : '#444',
-                    position: 'relative',
-                    transition: 'background 0.2s',
-                    flexShrink: 0,
-                }}>
-          <span style={{
-              position: 'absolute',
-              top: 3,
-              left: hardMode ? 19 : 3,
-              width: 14,
-              height: 14,
-              borderRadius: '50%',
-              background: 'white',
-              transition: 'left 0.2s',
-          }} />
-        </span>
-            </button>
+            <div style={{
+                position: 'fixed',
+                top: 16,
+                right: 16,
+                zIndex: 10000,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 6,
+            }}>
+                {[
+                    { label: 'Hard Mode', value: hardMode, set: setHardMode, activeColor: '#c0392b' },
+                    { label: 'Topography', value: satellite, set: setSatellite, activeColor: '#2980b9' },
+                ].map(({ label, value, set, activeColor }) => (
+                    <button
+                        key={label}
+                        onClick={() => set(v => !v)}
+                        style={{
+                            background: 'rgba(20,20,40,0.88)',
+                            backdropFilter: 'blur(8px)',
+                            color: 'white',
+                            border: '1px solid #444',
+                            borderRadius: 8,
+                            padding: '8px 16px',
+                            fontSize: 13,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            width: 160,
+                        }}
+                    >
+                        <span style={{ fontWeight: 'bold', letterSpacing: '0.04em' }}>{label}</span>
+                        <span style={{
+                            width: 36,
+                            height: 20,
+                            borderRadius: 10,
+                            background: value ? activeColor : '#444',
+                            position: 'relative',
+                            transition: 'background 0.2s',
+                            flexShrink: 0,
+                        }}>
+                            <span style={{
+                                position: 'absolute',
+                                top: 3,
+                                left: value ? 19 : 3,
+                                width: 14,
+                                height: 14,
+                                borderRadius: '50%',
+                                background: 'white',
+                                transition: 'left 0.2s',
+                            }} />
+                        </span>
+                    </button>
+                ))}
+            </div>
             <GameOverlay
                 phase={phase}
                 target={target}

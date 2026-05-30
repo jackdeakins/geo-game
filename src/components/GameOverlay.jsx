@@ -81,7 +81,7 @@ export default function GameOverlay({ phase, target, result, showResult, round, 
   }
 
   if (phase === 'done') {
-    const maxScore = totalRounds * 5000;
+    const maxScore = totalRounds * 4500;
     const pct = Math.round((totalScore / maxScore) * 100);
     return (
       <div style={overlay}>
@@ -90,7 +90,7 @@ export default function GameOverlay({ phase, target, result, showResult, round, 
           <div style={{ fontSize: 52, fontWeight: 'bold', color: '#4CAF50' }}>
             {totalScore.toLocaleString()}
           </div>
-          <div style={{ color: '#888', fontSize: 14, marginBottom: 20 }}>
+          <div style={{ color: '#aaa', fontSize: 15, fontWeight: 'bold', marginBottom: 20, fontVariantNumeric: 'tabular-nums' }}>
             {pct}% of {maxScore.toLocaleString()} possible
           </div>
           <div style={{ borderTop: '1px solid #333', paddingTop: 16 }}>
@@ -99,20 +99,43 @@ export default function GameOverlay({ phase, target, result, showResult, round, 
                 key={i}
                 style={{
                   display: 'flex',
-                  justifyContent: 'space-between',
+                  alignItems: 'center',
                   padding: '5px 0',
                   fontSize: 13,
                   color: '#ccc',
                   borderBottom: '1px solid #222',
+                  gap: 10,
                 }}
               >
-                <span style={{ color: s.correct ? '#4CAF50' : '#ff9800' }}>
-                  {s.correct ? '✓' : '✗'} Round {i + 1}
+                {/* colored bar */}
+                <div style={{
+                  width: 4,
+                  alignSelf: 'stretch',
+                  borderRadius: 2,
+                  background: s.correct ? '#4CAF50' : '#f44336',
+                  flexShrink: 0,
+                }} />
+
+                {/* country name */}
+                <span style={{ color: s.correct ? '#4CAF50' : '#f44336', fontWeight: 'bold', minWidth: 110, fontSize: 13, textAlign: 'left' }}>
+                  {s.name}
                 </span>
-                <span style={{ color: '#888', fontSize: 12 }}>
-                  {Math.round(s.distKm).toLocaleString()} km &nbsp;·&nbsp; {(s.timeMs / 1000).toFixed(1)}s
+
+                {/* distance · time */}
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ width: 100, textAlign: 'right', color: '#aaa', fontSize: 15, fontWeight: 'bold', fontVariantNumeric: 'tabular-nums' }}>
+                    {Math.round(s.distKm).toLocaleString()} km
+                  </span>
+                  <span style={{ width: 24, textAlign: 'center', color: '#666', fontSize: 15 }}>·</span>
+                  <span style={{ width: 44, textAlign: 'left', color: '#aaa', fontSize: 15, fontWeight: 'bold', fontVariantNumeric: 'tabular-nums' }}>
+                    {(s.timeMs / 1000).toFixed(1)}s
+                  </span>
+                </div>
+
+                {/* score */}
+                <span style={{ fontWeight: 'bold', color: 'white', minWidth: 48, textAlign: 'right' }}>
+                  {s.total.toLocaleString()}
                 </span>
-                <span style={{ fontWeight: 'bold', color: 'white' }}>{s.total.toLocaleString()}</span>
               </div>
             ))}
           </div>
@@ -206,7 +229,8 @@ export default function GameOverlay({ phase, target, result, showResult, round, 
               ? 'Correct!'
               : `${Math.round(result.distKm).toLocaleString()} km away`}
           </div>
-          <div style={{ display: 'flex', gap: 24, justifyContent: 'center', fontSize: 14, color: '#aaa', marginBottom: 14 }}>
+          <div style={{ display: 'flex', gap: 20, justifyContent: 'center', fontSize: 14, color: '#aaa', marginBottom: 14 }}>
+            {result.correct && <span style={{ color: '#4CAF50' }}>Correct +{result.correctBonus}</span>}
             <span>Speed +{result.timeScore}</span>
             <span>Accuracy +{result.distScore}</span>
             <span style={{ color: 'white', fontWeight: 'bold' }}>=&nbsp;{result.total}</span>

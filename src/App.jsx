@@ -32,11 +32,12 @@ function haversineKm(lat1, lng1, lat2, lng2) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function calcScore(timeMs, distKm) {
+function calcScore(timeMs, distKm, correct) {
     const timeSec = timeMs / 1000;
-    const timeScore = Math.max(0, Math.round(500 - timeSec * 25));
+    const correctBonus = correct ? 1000 : 0;
     const distScore = Math.round(2500 * Math.exp(-distKm / 1500));
-    return { timeScore, distScore, total: timeScore + distScore };
+    const timeScore = Math.max(0, Math.round(1000 - timeSec * 33));
+    return { correctBonus, timeScore, distScore, total: correctBonus + timeScore + distScore };
 }
 
 export default function App() {
@@ -112,9 +113,9 @@ export default function App() {
         const distKm = correct
             ? 0
             : haversineKm(latlng[0], latlng[1], target.centroid[0], target.centroid[1]);
-        const { timeScore, distScore, total } = calcScore(timeMs, distKm);
+        const { correctBonus, timeScore, distScore, total } = calcScore(timeMs, distKm, correct);
 
-        const roundResult = { latlng, distKm, timeMs, timeScore, distScore, total, correct };
+        const roundResult = { latlng, distKm, timeMs, correctBonus, timeScore, distScore, total, correct, name: target.name };
         const newScores = [...scores, roundResult];
         pendingScoresRef.current = newScores;
 

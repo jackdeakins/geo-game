@@ -143,13 +143,13 @@ export default function GameOverlay({ phase, target, result, showResult, round, 
           whiteSpace: 'nowrap',
         }}
       >
-        <span style={{ color: '#888', fontSize: 13 }}>
+        <span style={{ color: '#ccc', fontSize: 15, fontWeight: 'bold' }}>
           {round + 1} / {totalRounds}
         </span>
         <span style={{ fontSize: 22, fontWeight: 'bold', minWidth: 180, textAlign: 'center' }}>
           {target?.name}
         </span>
-        <span style={{ color: '#888', fontSize: 13 }}>{totalScore.toLocaleString()} pts</span>
+        <span style={{ color: '#f0c040', fontSize: 15, fontWeight: 'bold', fontVariantNumeric: 'tabular-nums' }}>{totalScore.toLocaleString()} pts</span>
       </div>
 
       {phase === 'playing' && (
@@ -160,9 +160,17 @@ export default function GameOverlay({ phase, target, result, showResult, round, 
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 9999,
-            color: elapsed >= 30 ? '#f44336' : '#888',
-            fontSize: 13,
+            background: elapsed >= 30 ? 'rgba(244,67,54,0.2)' : 'rgba(20,20,40,0.75)',
+            border: `1px solid ${elapsed >= 30 ? '#f44336' : '#555'}`,
+            borderRadius: 999,
+            padding: '4px 0',
+            width: 72,
+            textAlign: 'center',
+            color: elapsed >= 30 ? '#f44336' : '#fff',
+            fontSize: 20,
+            fontWeight: 'bold',
             fontVariantNumeric: 'tabular-nums',
+            transition: 'background 0.3s, border-color 0.3s, color 0.3s',
           }}
         >
           {elapsed}s

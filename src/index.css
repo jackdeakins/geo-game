@@ -1,7 +1,12 @@
+@font-face {
+  font-family: 'NTBrickSans';
+  src: url('/NTBrickSans.ttf') format('truetype');
+}
+
 * {
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html, body {
@@ -11,5 +16,5 @@ html, body {
 
 #root {
   width: 100vw;
-  height: 100vw;
+  height: 100vh;
 }

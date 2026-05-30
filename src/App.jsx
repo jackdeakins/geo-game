@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import GameMap from './components/GameMap';
 import GameOverlay from './components/GameOverlay';
 import Menu from './components/Menu';
+import LandingPage from './components/LandingPage';
 
 const TOTAL_ROUNDS = 10;
 const GEOJSON_URL = '/countries.geojson';
@@ -80,7 +81,7 @@ export default function App() {
                 countriesRef.current = list;
                 setGeoData(data);
                 setCountries(list);
-                setPhase('start');
+                setPhase('home');
             })
             .catch(() => setPhase('error'));
     }, []);
@@ -142,6 +143,10 @@ export default function App() {
         } else {
             beginRound(next, pendingScoresRef.current, countriesRef.current);
         }
+    }
+
+    if (phase === 'home') {
+        return <LandingPage onPlay={() => setPhase('start')} />;
     }
 
     return (

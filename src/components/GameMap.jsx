@@ -1,16 +1,8 @@
 import { useRef, useCallback } from 'react';
-//import { MapContainer, TileLayer, CircleMarker, useMapEvents, Pane } from 'react-leaflet';
 import Map, { Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-//import L from 'leaflet';
-//import 'leaflet/dist/leaflet.css';
-//import 'leaflet.vectorgrid';
 import AnimatedPolyline from './AnimatedPolyline';
 
-
-//if (L.DomEvent && !L.DomEvent.fakeStop) {
-//  L.DomEvent.fakeStop = () => true;
-//}
 const MAP_STYLE = {
   version: 8,
   sources: {},
@@ -58,7 +50,7 @@ const borderLayer = (borders) => ({
   source: 'countries',
   paint: {
     'line-color': '#a07840',
-    'line-width': borders ? 1 : 0, // same logic as before
+    'line-width': borders ? 1 : 0,
   },
 });
 
@@ -66,7 +58,7 @@ const highlightLayer = (targetName) => ({
   id: 'countries-highlight',
   type: 'fill',
   source: 'countries',
-  filter: ['==', ['get', 'name'], targetName || ''], // MapLibre filter expression to match target country
+  filter: ['==', ['get', 'name'], targetName || ''],
   paint: {
     'fill-color': '#7ec87a',
     'fill-opacity': 0.8,
@@ -75,14 +67,9 @@ const highlightLayer = (targetName) => ({
 
 export default function GameMap({ geoData, target, result, showHighlight, showResult, onMapClick, hardMode, satellite }) {
   const mapRef = useRef(null);
-  //const handlerRef = useRef(onMapClick);
-  //const vectorGridRef = useRef(null);
   const liveScoreRef = useRef(null);
-  //const hardModeRef = useRef(hardMode);
 
-  //const layerKey = `${hardMode}-${showHighlight ? 'highlight' : result ? 'result' : 'playing'}`;
-
- const handleClick = useCallback((e) => { 
+  const handleClick = useCallback((e) => { 
     if (!e.features || e.features.length === 0) {
       
       let lng = e.lngLat.lng; 
@@ -115,7 +102,7 @@ export default function GameMap({ geoData, target, result, showHighlight, showRe
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         style={{ height: '100%', width: '100%' }}
-        interactiveLayerIds={['countries-fill']} 
+        interactiveLayerIds={['countries-fill']}
         onClick={handleClick}
         mapStyle={MAP_STYLE}
       >
@@ -137,11 +124,11 @@ export default function GameMap({ geoData, target, result, showHighlight, showRe
         </Source>
 
         {geoData && (
-          <Source id="countries" type="geojson" data={geoData}> 
-            <Layer {...landLayer(satellite)} /> 
-            <Layer {...borderLayer(!hardMode)} /> 
+          <Source id="countries" type="geojson" data={geoData}>
+            <Layer {...landLayer(satellite)} />
+            <Layer {...borderLayer(!hardMode)} />
             {showHighlight && target && (
-              <Layer {...highlightLayer(target.name)} /> 
+              <Layer {...highlightLayer(target.name)} />
             )}
           </Source>
         )}
